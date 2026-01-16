@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import styles from "./codeblock.module.scss";
 
 export type RequestData = {
@@ -10,29 +11,40 @@ export type RequestData = {
     isEditable?: boolean;
   }[];
 };
-interface CodeBlockProps {
-  title: string;
-  type: "request" | "json" | "token";
-  requestData?: RequestData;
-  token?: string;
-}
+
+type CodeBlockMap = {
+  request: { requestData: RequestData };
+  json: { json: string };
+  token: { token: string };
+};
+type CodeBlockProps = {
+  [K in keyof CodeBlockMap]: {
+    title: string;
+    type: K;
+  } & CodeBlockMap[K];
+}[keyof CodeBlockMap];
 
 export const Codeblock = (props: CodeBlockProps) => {
-  const { title, type, requestData, token } = props;
+  const { title, type } = props;
   return (
     <div className={styles.scroll_container}>
       <div className={styles.container}>
         <div className={styles.title_container}>{title}</div>
         <div className={styles.code_block}>
-          {type === "request" && requestData ? (
+          {type === "request" ? (
             <>
               <div className={styles.code_line}>
                 <p className={styles.code_line_number}>01</p>
-                <p className={styles.param_value} data-editable={requestData.isEditable}>
-                  <span>{`${requestData.method ? requestData.method: ""} ${requestData.url}?`}</span>
+                <p
+                  className={styles.param_value}
+                  data-editable={props.requestData.isEditable}
+                >
+                  <span>{`${
+                    props.requestData.method ? props.requestData.method : ""
+                  } ${props.requestData.url}?`}</span>
                 </p>
               </div>
-              {requestData.params.map((data, idx) => (
+              {props.requestData.params.map((data, idx) => (
                 <div key={idx} className={styles.code_line}>
                   <p className={styles.code_line_number}>{`0${idx + 2}`}</p>
                   <p
@@ -46,7 +58,25 @@ export const Codeblock = (props: CodeBlockProps) => {
               ))}
             </>
           ) : null}
-          {type === "token" && token ? <p className={styles.token}>{token}</p> : null}
+          {type === "token" ? (
+            <p className={styles.token}>{props.token}</p>
+          ) : null}
+          {type === "json" ? (
+            <pre className={styles.json}>
+              {JSON.stringify(props.json, null, 2)
+                .split("\n")
+                .map((line, index) => (
+                  <div key={index} className={styles.code_line}>
+                    <p className={styles.code_line_number} >{`${
+                      index < 9 ? "0" : ""
+                    }${index + 1}`}</p>
+                    <p className={clsx(styles.param_value, styles.json_line)}>
+                      <span>{line}</span>
+                    </p>
+                  </div>
+                ))}
+            </pre>
+          ) : null}
         </div>
       </div>
     </div>
