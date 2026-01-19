@@ -39,8 +39,8 @@ export const Codeblock = (props: CodeBlockProps) => {
         <div
           className={clsx(
             styles.code_block,
-            type === "token" && styles.vertical_scroll_container,
-            type === "request" && styles.horizontal_scroll_container,
+            type === "token" || type === "json" && styles.vertical_scroll_container,
+            type === "request" || type === "json" && styles.horizontal_scroll_container,
           )}
         >
           {type === "request" && props.requestData ? (

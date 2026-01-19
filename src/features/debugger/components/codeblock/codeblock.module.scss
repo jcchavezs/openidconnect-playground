@@ -12,7 +12,7 @@
 }
 
 .vertical_scroll_container {
-  max-height: 248px;
+  max-height: 275px;
   @media #{$breakpoint-dimension-sm} {
     max-height: fit-content;
   }
@@ -65,6 +65,7 @@
 
 .code_line_number {
   color: var(--functional-gray-550);
+  flex-shrink: 0;
 }
 
 .param_value {
