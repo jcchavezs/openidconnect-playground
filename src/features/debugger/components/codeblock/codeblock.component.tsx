@@ -1,5 +1,6 @@
-import clsx from "clsx";
+import { ComponentType } from "react";
 import styles from "./codeblock.module.scss";
+import clsx from "clsx";
 
 export type RequestData = {
   url: string;
@@ -22,16 +23,27 @@ type CodeBlockProps = {
     title: string;
     type: K;
   } & CodeBlockMap[K];
-}[keyof CodeBlockMap];
+}[keyof CodeBlockMap] & {
+  HeaderRightComponent?: ComponentType;
+};
 
 export const Codeblock = (props: CodeBlockProps) => {
-  const { title, type } = props;
+  const { title, type, HeaderRightComponent } = props;
   return (
-    <div className={styles.scroll_container}>
-      <div className={styles.container}>
+    <div className={styles.container}>
+      <div className={styles.header_container}>
         <div className={styles.title_container}>{title}</div>
-        <div className={styles.code_block}>
-          {type === "request" ? (
+        {HeaderRightComponent && <HeaderRightComponent />}
+      </div>
+      <div className={styles.scroll_container}>
+        <div
+          className={clsx(
+            styles.code_block,
+            type === "token" && styles.vertical_scroll_container,
+            type === "request" && styles.horizontal_scroll_container,
+          )}
+        >
+          {type === "request" && props.requestData ? (
             <>
               <div className={styles.code_line}>
                 <p className={styles.code_line_number}>01</p>
@@ -39,9 +51,7 @@ export const Codeblock = (props: CodeBlockProps) => {
                   className={styles.param_value}
                   data-editable={props.requestData.isEditable}
                 >
-                  <span>{`${
-                    props.requestData.method ? props.requestData.method : ""
-                  } ${props.requestData.url}?`}</span>
+                  <span>{`${props.requestData.method ? props.requestData.method : ""} ${props.requestData.url}?`}</span>
                 </p>
               </div>
               {props.requestData.params.map((data, idx) => (
@@ -67,7 +77,7 @@ export const Codeblock = (props: CodeBlockProps) => {
                 .split("\n")
                 .map((line, index) => (
                   <div key={index} className={styles.code_line}>
-                    <p className={styles.code_line_number} >{`${
+                    <p className={styles.code_line_number}>{`${
                       index < 9 ? "0" : ""
                     }${index + 1}`}</p>
                     <p className={clsx(styles.param_value, styles.json_line)}>
