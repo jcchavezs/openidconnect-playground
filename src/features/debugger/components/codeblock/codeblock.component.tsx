@@ -1,3 +1,4 @@
+import { ComponentType } from "react";
 import styles from "./codeblock.module.scss";
 
 export type RequestData = {
@@ -15,21 +16,28 @@ interface CodeBlockProps {
   type: "request" | "json" | "token";
   requestData?: RequestData;
   token?: string;
+  HeaderRightComponent?: ComponentType;
 }
 
 export const Codeblock = (props: CodeBlockProps) => {
-  const { title, type, requestData, token } = props;
+  const { title, type, requestData, token, HeaderRightComponent } = props;
   return (
     <div className={styles.scroll_container}>
       <div className={styles.container}>
-        <div className={styles.title_container}>{title}</div>
+        <div className={styles.header_container}>
+          <div className={styles.title_container}>{title}</div>
+          {HeaderRightComponent && <HeaderRightComponent />}
+        </div>
         <div className={styles.code_block}>
           {type === "request" && requestData ? (
             <>
               <div className={styles.code_line}>
                 <p className={styles.code_line_number}>01</p>
-                <p className={styles.param_value} data-editable={requestData.isEditable}>
-                  <span>{`${requestData.method ? requestData.method: ""} ${requestData.url}?`}</span>
+                <p
+                  className={styles.param_value}
+                  data-editable={requestData.isEditable}
+                >
+                  <span>{`${requestData.method ? requestData.method : ""} ${requestData.url}?`}</span>
                 </p>
               </div>
               {requestData.params.map((data, idx) => (
@@ -46,7 +54,9 @@ export const Codeblock = (props: CodeBlockProps) => {
               ))}
             </>
           ) : null}
-          {type === "token" && token ? <p className={styles.token}>{token}</p> : null}
+          {type === "token" && token ? (
+            <p className={styles.token}>{token}</p>
+          ) : null}
         </div>
       </div>
     </div>
